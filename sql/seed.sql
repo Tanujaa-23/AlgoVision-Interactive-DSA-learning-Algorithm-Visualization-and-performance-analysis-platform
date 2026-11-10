@@ -2,7 +2,6 @@
 
 -- Standard Admin and Demo Student Users (Passwords hashed using SHA-256 for 'admin123' and 'student123')
 INSERT INTO users (name, email, password, role, streak_days) VALUES
-('System Administrator', 'admin@algovision.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'ADMIN', 15),
 ('Alex Student', 'student@algovision.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'STUDENT', 7)
 ON CONFLICT (email) DO NOTHING;
 
