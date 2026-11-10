@@ -214,7 +214,6 @@ You can test the application using the following pre-configured user accounts:
 | Role | Email | Password | Access Level |
 |---|---|---|---|
 | **Student (Default)** | `student@algovision.com` | `student123` | Full Access (Visualizers, Quizzes, Challenges, Dashboard) |
-| **Admin** | `admin@algovision.com` | `admin123` | Administrator Portal (`/admin`), Metrics, System Management |
 
 ## 💡 Key Usability Tips
 
