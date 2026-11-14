@@ -34,13 +34,20 @@ public class DashboardServlet extends HttpServlet {
         if (user == null) {
             user = new User(2, "Alex Student", "student@algovision.com", "", "STUDENT");
             user.setStreakDays(7);
+        } else if (user.getId() <= 0) {
+            User refreshed = new com.algovision.dao.UserDAO().getUserByEmail(user.getEmail());
+            if (refreshed != null && refreshed.getId() > 0) {
+                user = refreshed;
+                session.setAttribute("loggedUser", user);
+                session.setAttribute("userId", user.getId());
+            }
         }
 
-        int userId = user.getId();
+        int userId = user.getId() > 0 ? user.getId() : 2;
         List<Execution> recentExecutions = executionDAO.getRecentExecutionsByUser(userId, 8);
         List<QuizResult> recentQuizzes = quizDAO.getResultsByUser(userId);
 
-        double avgQuizScore = 86.0;
+        double avgQuizScore = (userId == 2) ? 86.0 : 0.0;
         if (!recentQuizzes.isEmpty()) {
             double sum = 0;
             for (QuizResult r : recentQuizzes) sum += r.getPercentage();
@@ -56,13 +63,9 @@ public class DashboardServlet extends HttpServlet {
         }
 
         int totalExecutions = executionDAO.getTotalExecutionCountByUser(userId);
-        int distinctAlgorithmsCompleted = executionDAO.getDistinctAlgorithmCountByUser(userId);
         
-        // Accurate count of algorithms completed: increments dynamically with each visualized run
-        int algorithmsCompleted = Math.max(totalExecutions, distinctAlgorithmsCompleted);
-        if (algorithmsCompleted == 0 && recentExecutions != null && !recentExecutions.isEmpty()) {
-            algorithmsCompleted = recentExecutions.size();
-        }
+        // Accurate count of algorithms completed: starts at 0 for new user, increments with each algorithm performed
+        int algorithmsCompleted = totalExecutions;
 
         com.algovision.dao.ChallengeDAO challengeDAO = new com.algovision.dao.ChallengeDAO();
         List<com.algovision.model.Submission> userSubs = challengeDAO.getSubmissionsByUser(userId);
@@ -78,7 +81,7 @@ public class DashboardServlet extends HttpServlet {
         request.setAttribute("algorithmsCompleted", algorithmsCompleted);
         request.setAttribute("problemsSolved", problemsSolved);
         request.setAttribute("quizScorePct", String.format("%.1f", avgQuizScore));
-        request.setAttribute("streakDays", user.getStreakDays() > 0 ? user.getStreakDays() : 7);
+        request.setAttribute("streakDays", user.getStreakDays() > 0 ? user.getStreakDays() : (userId == 2 ? 7 : 1));
         request.setAttribute("recentExecutions", recentExecutions);
         request.setAttribute("recentQuizzes", recentQuizzes);
         request.setAttribute("userProgress", userProgressList);

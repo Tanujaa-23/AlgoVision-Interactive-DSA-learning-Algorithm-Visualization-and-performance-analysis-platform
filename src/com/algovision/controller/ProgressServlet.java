@@ -21,10 +21,11 @@ public class ProgressServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("loggedUser") : null;
         int userId = 2; // Default to Student (user 2)
-        if (user != null) {
+        if (user != null && user.getId() > 0) {
             userId = user.getId();
         } else if (session != null && session.getAttribute("userId") != null) {
-            userId = (Integer) session.getAttribute("userId");
+            int sessId = (Integer) session.getAttribute("userId");
+            if (sessId > 0) userId = sessId;
         }
 
         request.setAttribute("userProgress", progressService.getUserProgress(userId));

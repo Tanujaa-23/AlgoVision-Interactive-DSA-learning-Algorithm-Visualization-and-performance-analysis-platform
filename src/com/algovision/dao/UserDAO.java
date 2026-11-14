@@ -70,10 +70,30 @@ public class UserDAO {
             Type listType = new TypeToken<List<User>>() {}.getType();
             List<User> loaded = gson.fromJson(reader, listType);
             if (loaded != null) {
+                int maxId = 2;
+                for (User u : loaded) {
+                    if (u.getId() > maxId) {
+                        maxId = u.getId();
+                    }
+                }
+                boolean needSave = false;
                 for (User u : loaded) {
                     if (u.getEmail() != null) {
-                        memoryUsers.put(u.getEmail().toLowerCase().trim(), u);
+                        String cleanEmail = u.getEmail().toLowerCase().trim();
+                        if (u.getId() <= 0) {
+                            maxId++;
+                            u.setId(maxId);
+                            needSave = true;
+                        }
+                        if (u.getStreakDays() <= 0) {
+                            u.setStreakDays(1);
+                            needSave = true;
+                        }
+                        memoryUsers.put(cleanEmail, u);
                     }
+                }
+                if (needSave) {
+                    saveUsersToFile();
                 }
             }
         } catch (Exception e) {
@@ -92,6 +112,20 @@ public class UserDAO {
         
         String rawPassword = user.getPassword().trim();
         String hashedPassword = PasswordUtil.hashPassword(rawPassword);
+
+        // Assign a distinct positive ID (> 2) for the new user if not already assigned
+        if (user.getId() <= 0) {
+            int maxId = 2;
+            for (User u : memoryUsers.values()) {
+                if (u.getId() > maxId) {
+                    maxId = u.getId();
+                }
+            }
+            user.setId(maxId + 1);
+        }
+        if (user.getStreakDays() <= 0) {
+            user.setStreakDays(1);
+        }
 
         user.setName(cleanName);
         user.setEmail(cleanEmail);
@@ -184,6 +218,16 @@ public class UserDAO {
                 hashedCleanPass.equalsIgnoreCase(storedPassword) ||
                 plainPassword.equals(storedPassword) ||
                 cleanPass.equals(storedPassword)) {
+                
+                if (user.getId() <= 0) {
+                    int maxId = 2;
+                    for (User u : memoryUsers.values()) {
+                        if (u.getId() > maxId) maxId = u.getId();
+                    }
+                    user.setId(maxId + 1);
+                    if (user.getStreakDays() <= 0) user.setStreakDays(1);
+                    saveUsersToFile();
+                }
                 return user;
             }
             // User exists, but password was incorrect
@@ -210,6 +254,31 @@ public class UserDAO {
             return autoRestoredUser;
         }
 
+        return null;
+    }
+
+    public User getUserById(int id) {
+        if (id <= 0) return null;
+        for (User u : memoryUsers.values()) {
+            if (u.getId() == id) return u;
+        }
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    User u = new User();
+                    u.setId(rs.getInt("id"));
+                    u.setName(rs.getString("name"));
+                    u.setEmail(rs.getString("email").trim().toLowerCase());
+                    u.setPassword(rs.getString("password"));
+                    u.setRole(rs.getString("role"));
+                    u.setStreakDays(rs.getInt("streak_days"));
+                    return u;
+                }
+            }
+        } catch (Exception ignored) {}
         return null;
     }
 

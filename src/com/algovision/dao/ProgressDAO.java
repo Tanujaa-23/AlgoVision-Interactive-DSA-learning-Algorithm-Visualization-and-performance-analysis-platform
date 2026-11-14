@@ -1,6 +1,7 @@
 package com.algovision.dao;
 
 import com.algovision.model.Achievement;
+import com.algovision.model.User;
 import com.algovision.model.UserProgress;
 import com.algovision.util.DBConnection;
 
@@ -58,7 +59,7 @@ public class ProgressDAO {
             if (loaded != null) {
                 // If there were records under user 0, merge into user 2 (student)
                 if (loaded.containsKey(0)) {
-                    Map<String, UserProgress> u0 = loaded.get(0);
+                    Map<String, UserProgress> u0 = loaded.remove(0);
                     Map<String, UserProgress> u2 = loaded.computeIfAbsent(2, k -> new LinkedHashMap<>());
                     for (Map.Entry<String, UserProgress> entry : u0.entrySet()) {
                         String topic = entry.getKey();
@@ -76,6 +77,7 @@ public class ProgressDAO {
                     }
                 }
                 memoryProgress.putAll(loaded);
+                saveProgressToFile();
             }
         } catch (Exception e) {
             System.err.println("[ProgressDAO] Warning: Failed to load progress records: " + e.getMessage());
@@ -157,7 +159,7 @@ public class ProgressDAO {
         // Sync with actual executions performed in ExecutionDAO
         List<com.algovision.model.Execution> execs = ExecutionDAO.getMemoryExecutions();
         for (com.algovision.model.Execution ex : execs) {
-            if (ex.getUserId() == targetUser || ex.getUserId() <= 0 || (targetUser == 2 && ex.getUserId() == 1) || (targetUser == 1 && ex.getUserId() == 2)) {
+            if (ex.getUserId() == targetUser || (targetUser == 2 && (ex.getUserId() == 1 || ex.getUserId() <= 0))) {
                 String cat = ex.getCategory();
                 String name = ex.getAlgorithmName();
                 if (cat != null && name != null) {
@@ -206,7 +208,14 @@ public class ProgressDAO {
             }
         }
 
-        earnedKeys.add("streak_7"); // Demo student has 7 day streak
+        if (targetUser == 2) {
+            earnedKeys.add("streak_7"); // Demo student has 7 day streak
+        } else {
+            User u = new UserDAO().getUserById(targetUser);
+            if (u != null && u.getStreakDays() >= 7) {
+                earnedKeys.add("streak_7");
+            }
+        }
 
         String sql = "SELECT a.badge_key, ua.earned_at FROM user_achievements ua JOIN achievements a ON ua.achievement_id = a.id WHERE ua.user_id = ?";
         try (Connection conn = DBConnection.getConnection();

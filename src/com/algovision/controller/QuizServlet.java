@@ -37,7 +37,7 @@ public class QuizServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("loggedUser") : null;
-        int userId = user != null ? user.getId() : 1;
+        int userId = (user != null && user.getId() > 0) ? user.getId() : 2;
 
         String topic = request.getParameter("topic");
         if (topic == null) topic = "Sorting";

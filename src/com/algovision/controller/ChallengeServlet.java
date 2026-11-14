@@ -42,7 +42,7 @@ public class ChallengeServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("loggedUser") : null;
-        int userId = user != null ? user.getId() : 1;
+        int userId = (user != null && user.getId() > 0) ? user.getId() : 2;
 
         int challengeId = 1;
         try {

@@ -96,9 +96,22 @@ public class VisualizationServlet extends HttpServlet {
         User user = (session != null) ? (User) session.getAttribute("loggedUser") : null;
         int userId = 2; // Default to Student (user 2)
         if (user != null) {
-            userId = user.getId();
+            if (user.getId() <= 0) {
+                User dbUser = new com.algovision.dao.UserDAO().getUserByEmail(user.getEmail());
+                if (dbUser != null && dbUser.getId() > 0) {
+                    user.setId(dbUser.getId());
+                    session.setAttribute("loggedUser", user);
+                    session.setAttribute("userId", user.getId());
+                }
+            }
+            if (user.getId() > 0) {
+                userId = user.getId();
+            }
         } else if (session != null && session.getAttribute("userId") != null) {
-            userId = (Integer) session.getAttribute("userId");
+            int sessId = (Integer) session.getAttribute("userId");
+            if (sessId > 0) {
+                userId = sessId;
+            }
         }
 
         String algoName = request.getParameter("algorithm");

@@ -214,21 +214,19 @@ public class ExecutionDAO {
                     list.add(e);
                 }
             }
+            if (!list.isEmpty()) {
+                return list;
+            }
         } catch (Exception e) {
             // DB fallback
         }
 
-        if (list.isEmpty()) {
-            for (int i = memoryExecutions.size() - 1; i >= 0 && list.size() < limit; i--) {
-                Execution ex = memoryExecutions.get(i);
-                if (ex.getUserId() == userId || ex.getUserId() <= 0 || (userId == 2 && ex.getUserId() == 1) || (userId == 1 && ex.getUserId() == 2) || userId <= 0) {
-                    list.add(ex);
-                }
-            }
-            if (list.isEmpty()) {
-                for (int i = memoryExecutions.size() - 1; i >= 0 && list.size() < limit; i--) {
-                    list.add(memoryExecutions.get(i));
-                }
+        for (int i = memoryExecutions.size() - 1; i >= 0 && list.size() < limit; i--) {
+            Execution ex = memoryExecutions.get(i);
+            if (ex.getUserId() == userId) {
+                list.add(ex);
+            } else if (userId == 2 && (ex.getUserId() == 1 || ex.getUserId() <= 0)) {
+                list.add(ex);
             }
         }
         return list;
@@ -254,7 +252,11 @@ public class ExecutionDAO {
         }
 
         for (Execution ex : memoryExecutions) {
-            if (ex.getUserId() == userId || ex.getUserId() <= 0 || (userId == 2 && (ex.getUserId() == 1 || ex.getUserId() == 2)) || userId <= 0) {
+            if (ex.getUserId() == userId) {
+                if (ex.getAlgorithmName() != null && !ex.getAlgorithmName().trim().isEmpty()) {
+                    distinct.add(ex.getAlgorithmName().trim().toLowerCase());
+                }
+            } else if (userId == 2 && (ex.getUserId() == 1 || ex.getUserId() <= 0)) {
                 if (ex.getAlgorithmName() != null && !ex.getAlgorithmName().trim().isEmpty()) {
                     distinct.add(ex.getAlgorithmName().trim().toLowerCase());
                 }
@@ -265,27 +267,34 @@ public class ExecutionDAO {
 
     public int getTotalExecutionCountByUser(int userId) {
         loadExecutionsFromFile();
-        int count = 0;
+        int dbCount = 0;
+        boolean dbSuccess = false;
         String sql = "SELECT COUNT(*) FROM algorithm_executions WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) return rs.getInt(1);
+                if (rs.next()) {
+                    dbCount = rs.getInt(1);
+                    dbSuccess = true;
+                }
             }
         } catch (Exception e) {
             // DB fallback
         }
 
+        int memCount = 0;
         for (Execution ex : memoryExecutions) {
-            if (ex.getUserId() == userId || ex.getUserId() <= 0 || (userId == 2 && (ex.getUserId() == 1 || ex.getUserId() == 2)) || userId <= 0) {
-                count++;
+            if (ex.getUserId() == userId) {
+                memCount++;
+            } else if (userId == 2 && (ex.getUserId() == 1 || ex.getUserId() <= 0)) {
+                memCount++;
             }
         }
-        if (count == 0 && !memoryExecutions.isEmpty()) {
-            return memoryExecutions.size();
+        if (dbSuccess) {
+            return Math.max(dbCount, memCount);
         }
-        return count;
+        return memCount;
     }
 
     public int getTotalExecutionCount() {
