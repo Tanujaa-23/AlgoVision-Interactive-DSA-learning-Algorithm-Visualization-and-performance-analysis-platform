@@ -13,12 +13,18 @@ class VisualizerEngine {
         this.speed = 300; // ms per step
         this.timer = null;
         this.category = "Sorting";
+        this.currentAlgo = "";
+        this.currentInput = "";
+        this.hasRecorded = false;
     }
 
-    setSteps(steps, category = "Sorting") {
+    setSteps(steps, category = "Sorting", algo = "", input = "") {
         this.steps = steps || [];
         this.category = category;
+        this.currentAlgo = algo;
+        this.currentInput = input;
         this.currentStepIdx = 0;
+        this.hasRecorded = false;
         this.pause();
         if (this.logContainer) this.logContainer.innerHTML = "";
 
@@ -181,8 +187,33 @@ class VisualizerEngine {
                         sEl.className = "text-success h4";
                     }
                 }
+                this.recordCompletion();
             }
         }, this.speed);
+    }
+
+    recordCompletion() {
+        if (this.hasRecorded || !this.steps || this.steps.length === 0) return;
+        this.hasRecorded = true;
+
+        const lastStep = this.steps[this.steps.length - 1];
+        const contextPath = window.contextPath || "";
+        const endpoint = contextPath ? (contextPath + "/visualize") : "visualize";
+
+        const params = new URLSearchParams();
+        params.append("action", "record");
+        params.append("category", this.category || "Sorting");
+        params.append("algorithm", this.currentAlgo || "Bubble Sort");
+        params.append("inputData", this.currentInput || "");
+        params.append("stepCount", this.steps.length);
+        params.append("comparisons", (lastStep && lastStep.comparisonCount) ? lastStep.comparisonCount : this.steps.length);
+        params.append("swaps", (lastStep && lastStep.swapCount) ? lastStep.swapCount : 0);
+
+        fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString()
+        }).catch(err => console.warn("Failed to record completion:", err));
     }
 
     pause() {

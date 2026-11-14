@@ -18,6 +18,8 @@ class GraphCanvasVisualizer {
         this.speed = 500; // ms per step
         this.timer = null;
         this.currentAlgo = "BFS";
+        this.inputData = "";
+        this.hasRecorded = false;
 
         // Build default 1..9 node graph
         this.buildGraphFromNodes(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
@@ -158,10 +160,12 @@ class GraphCanvasVisualizer {
         });
     }
 
-    setSteps(steps, algo = "BFS") {
+    setSteps(steps, algo = "BFS", inputData = "") {
         this.steps = steps || [];
         this.currentAlgo = algo;
+        this.inputData = inputData;
         this.currentStepIdx = 0;
+        this.hasRecorded = false;
         this.pause();
         if (this.logContainer) this.logContainer.innerHTML = "";
 
@@ -263,8 +267,32 @@ class GraphCanvasVisualizer {
                     sEl.innerText = "Completed";
                     sEl.className = "text-success h4";
                 }
+                this.recordCompletion();
             }
         }, this.speed);
+    }
+
+    recordCompletion() {
+        if (this.hasRecorded || !this.steps || this.steps.length === 0) return;
+        this.hasRecorded = true;
+
+        const contextPath = window.contextPath || "";
+        const endpoint = contextPath ? (contextPath + "/visualize") : "visualize";
+
+        const params = new URLSearchParams();
+        params.append("action", "record");
+        params.append("category", "Graph");
+        params.append("algorithm", this.currentAlgo || "BFS");
+        params.append("inputData", this.inputData || "");
+        params.append("stepCount", this.steps.length);
+        params.append("comparisons", this.steps.length);
+        params.append("swaps", 0);
+
+        fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString()
+        }).catch(err => console.warn("Failed to record graph completion:", err));
     }
 
     pause() {

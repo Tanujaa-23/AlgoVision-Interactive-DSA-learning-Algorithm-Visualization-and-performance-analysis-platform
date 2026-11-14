@@ -160,6 +160,20 @@ public class ExecutionDAO {
 
         loadExecutionsFromFile();
 
+        // Prevent duplicate execution records for the same user, algorithm and input within a 10-second window
+        long now = exec.getExecutedAt().getTime();
+        for (int i = memoryExecutions.size() - 1; i >= 0 && i >= memoryExecutions.size() - 10; i--) {
+            Execution prev = memoryExecutions.get(i);
+            if (prev.getUserId() == exec.getUserId() &&
+                prev.getAlgorithmName() != null && prev.getAlgorithmName().equalsIgnoreCase(exec.getAlgorithmName()) &&
+                prev.getInputData() != null && prev.getInputData().equals(exec.getInputData())) {
+                long prevTime = prev.getExecutedAt() != null ? prev.getExecutedAt().getTime() : 0;
+                if (Math.abs(now - prevTime) < 10000) {
+                    return false;
+                }
+            }
+        }
+
         String sql = "INSERT INTO algorithm_executions (user_id, algorithm_name, input_data, step_count, comparison_count, swap_count, execution_time_ms) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

@@ -114,6 +114,10 @@ public class VisualizationServlet extends HttpServlet {
             }
         }
 
+        String action = request.getParameter("action");
+        String recordParam = request.getParameter("record");
+        boolean shouldRecord = "true".equalsIgnoreCase(recordParam);
+
         String algoName = request.getParameter("algorithm");
         String inputStr = request.getParameter("inputData");
         String category = request.getParameter("category");
@@ -131,6 +135,41 @@ public class VisualizationServlet extends HttpServlet {
             category = inferTypeFromAlgorithm(algoName);
         }
 
+        if ("record".equalsIgnoreCase(action)) {
+            String stepCountStr = request.getParameter("stepCount");
+            int stepCount = 10;
+            try { if (stepCountStr != null) stepCount = Integer.parseInt(stepCountStr.trim()); } catch (Exception ignored) {}
+
+            String compStr = request.getParameter("comparisons");
+            int comparisons = 0;
+            try { if (compStr != null) comparisons = Integer.parseInt(compStr.trim()); } catch (Exception ignored) {}
+
+            String swapStr = request.getParameter("swaps");
+            int swaps = 0;
+            try { if (swapStr != null) swaps = Integer.parseInt(swapStr.trim()); } catch (Exception ignored) {}
+
+            String timeStr = request.getParameter("executionTimeMs");
+            double timeMs = 1.0;
+            try { if (timeStr != null) timeMs = Double.parseDouble(timeStr.trim()); } catch (Exception ignored) {}
+
+            com.algovision.model.Execution exec = new com.algovision.model.Execution();
+            exec.setUserId(userId);
+            exec.setAlgorithmName(algoName);
+            exec.setInputData(inputStr != null ? inputStr : "");
+            exec.setStepCount(stepCount > 0 ? stepCount : 1);
+            exec.setComparisonCount(comparisons);
+            exec.setSwapCount(swaps);
+            exec.setExecutionTimeMs(timeMs);
+
+            com.algovision.dao.ExecutionDAO executionDAO = new com.algovision.dao.ExecutionDAO();
+            executionDAO.recordExecution(exec);
+            progressDAO.recordAlgorithmProgress(userId, category, algoName);
+
+            out.print("{\"status\":\"recorded\",\"userId\":" + userId + "}");
+            out.flush();
+            return;
+        }
+
         if ("Sorting".equalsIgnoreCase(category)) {
             int[] arr;
             try {
@@ -138,7 +177,7 @@ public class VisualizationServlet extends HttpServlet {
             } catch (Exception e) {
                 arr = new int[]{5, 2, 8, 1, 3, 9, 4, 7};
             }
-            List<AlgorithmStep> steps = algorithmService.executeSortingAlgorithm(algoName, arr, userId);
+            List<AlgorithmStep> steps = algorithmService.executeSortingAlgorithm(algoName, arr, userId, shouldRecord);
             out.print(gson.toJson(steps));
 
         } else if ("Searching".equalsIgnoreCase(category)) {
@@ -153,7 +192,7 @@ public class VisualizationServlet extends HttpServlet {
             } catch (Exception e) {
                 arr = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
             }
-            List<AlgorithmStep> steps = algorithmService.executeSearchingAlgorithm(algoName, arr, target, userId);
+            List<AlgorithmStep> steps = algorithmService.executeSearchingAlgorithm(algoName, arr, target, userId, shouldRecord);
             out.print(gson.toJson(steps));
 
         } else if ("Graph".equalsIgnoreCase(category)) {
@@ -244,7 +283,7 @@ public class VisualizationServlet extends HttpServlet {
             long endTime = System.nanoTime();
             double elapsedMs = (endTime - startTime) / 1e6;
 
-            if (steps != null && !steps.isEmpty()) {
+            if (shouldRecord && steps != null && !steps.isEmpty()) {
                 com.algovision.model.Execution exec = new com.algovision.model.Execution();
                 exec.setUserId(userId);
                 exec.setAlgorithmName(algoName);
@@ -256,10 +295,8 @@ public class VisualizationServlet extends HttpServlet {
 
                 com.algovision.dao.ExecutionDAO executionDAO = new com.algovision.dao.ExecutionDAO();
                 executionDAO.recordExecution(exec);
+                progressDAO.recordAlgorithmProgress(userId, "Graph", algoName);
             }
-
-            // Increment & refresh user progress accurately for Graph algorithms
-            progressDAO.recordAlgorithmProgress(userId, "Graph", algoName);
 
             out.print(gson.toJson(steps));
         } else {

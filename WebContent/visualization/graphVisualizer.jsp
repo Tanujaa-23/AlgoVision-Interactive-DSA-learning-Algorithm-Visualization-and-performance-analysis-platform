@@ -245,6 +245,7 @@
             params.append("algorithm", algo);
             params.append("startNode", start);
             params.append("inputData", nodes.join(", "));
+            params.append("record", "false"); // Never record on step fetch / preview
 
             const contextPath = window.contextPath || "";
             const endpoint = contextPath ? (contextPath + "/visualize") : "visualize";
@@ -257,7 +258,7 @@
             .then(res => res.json())
             .then(steps => {
                 if (graphVis) {
-                    graphVis.setSteps(steps, algo);
+                    graphVis.setSteps(steps, algo, "Nodes: " + nodes.join(", ") + ", Start: " + start);
                     const urlParams = new URLSearchParams(window.location.search);
                     const isRunRequested = shouldAutoPlay || urlParams.get("run") === "true";
                     if (isRunRequested) {

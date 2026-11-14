@@ -28,6 +28,10 @@ public class AlgorithmService {
     }
 
     public List<AlgorithmStep> executeSortingAlgorithm(String algoName, int[] inputArr, int userId) {
+        return executeSortingAlgorithm(algoName, inputArr, userId, false);
+    }
+
+    public List<AlgorithmStep> executeSortingAlgorithm(String algoName, int[] inputArr, int userId, boolean shouldRecord) {
         long start = System.nanoTime();
         List<AlgorithmStep> steps;
 
@@ -56,7 +60,7 @@ public class AlgorithmService {
         long end = System.nanoTime();
         double elapsedMs = (end - start) / 1e6;
 
-        if (!steps.isEmpty()) {
+        if (shouldRecord && !steps.isEmpty()) {
             AlgorithmStep finalStep = steps.get(steps.size() - 1);
 
             Execution exec = new Execution();
@@ -78,6 +82,10 @@ public class AlgorithmService {
     }
 
     public List<AlgorithmStep> executeSearchingAlgorithm(String algoName, int[] inputArr, int target, int userId) {
+        return executeSearchingAlgorithm(algoName, inputArr, target, userId, false);
+    }
+
+    public List<AlgorithmStep> executeSearchingAlgorithm(String algoName, int[] inputArr, int target, int userId, boolean shouldRecord) {
         long start = System.nanoTime();
         List<AlgorithmStep> steps;
 
@@ -95,7 +103,7 @@ public class AlgorithmService {
         long end = System.nanoTime();
         double elapsedMs = (end - start) / 1e6;
 
-        if (!steps.isEmpty()) {
+        if (shouldRecord && !steps.isEmpty()) {
             AlgorithmStep finalStep = steps.get(steps.size() - 1);
             Execution exec = new Execution();
             exec.setUserId(userId);

@@ -27,13 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    const inputDataEl = document.getElementById("inputData");
-    if (inputDataEl) {
-        inputDataEl.addEventListener("change", () => {
-            fetchSteps(false);
-        });
-    }
-
     const algoSelect = document.getElementById("algorithmSelect");
     if (algoSelect) {
         algoSelect.addEventListener("change", () => {
@@ -47,13 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const targetDisplay = document.getElementById("targetDisplay");
             if (targetDisplay) targetDisplay.innerText = targetInput.value;
         });
-        targetInput.addEventListener("change", () => {
-            fetchSteps(false);
-        });
     }
 
-    // Default initial load
-    fetchSteps();
+    // Default initial load for rendering visualizer canvas without recording
+    fetchSteps(false);
 });
 
 function fetchSteps(shouldAutoPlay = false) {
@@ -73,6 +63,7 @@ function fetchSteps(shouldAutoPlay = false) {
     formData.append("algorithm", algo);
     formData.append("inputData", inputData);
     formData.append("category", category);
+    formData.append("record", "false"); // Never record on step fetch / preview
     if (target) formData.append("target", target);
 
     const contextPath = window.contextPath || "";
@@ -85,7 +76,7 @@ function fetchSteps(shouldAutoPlay = false) {
     })
     .then(res => res.json())
     .then(steps => {
-        engine.setSteps(steps, category);
+        engine.setSteps(steps, category, algo, inputData);
         const urlParams = new URLSearchParams(window.location.search);
         const isRunRequested = shouldAutoPlay || urlParams.get("run") === "true";
         if (isRunRequested) {
