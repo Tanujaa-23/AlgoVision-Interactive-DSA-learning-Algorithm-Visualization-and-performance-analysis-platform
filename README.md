@@ -291,6 +291,7 @@ You can test the application using the following pre-configured user accounts:
 | Role | Email | Password | Access Level |
 |---|---|---|---|
 | **Student (Default)** | `student@algovision.com` | `student123` | Full Access (Visualizers, Quizzes, Challenges, Dashboard) |
+<<<<<<< HEAD
 *Note: Guest visitors can explore the platform without an explicit login; demo sessions default automatically to Student ID 2 (`Alex Student`).*
 
 ---
@@ -339,3 +340,8 @@ Contributions are welcome! If you'd like to contribute new algorithms, data stru
 ## 📄 License
 
 This project is licensed under the **MIT License** — feel free to use, modify, and distribute for educational or commercial purposes.
+=======
+<<<<<<< HEAD
+| **Admin** | `admin@algovision.com` | `admin123` | Administrator Portal (`/admin`), Metrics, System Management |
+
+>>>>>>> 1e5141ac05cf0e6aed0ddbb03d8c614b49a8e414
