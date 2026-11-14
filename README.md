@@ -57,10 +57,17 @@ Provides dedicated interactive visualizer workspaces categorized into:
   - `Bubble Sort`, `Selection Sort`, `Insertion Sort`, `Merge Sort`, `Quick Sort`, `Heap Sort`
   - Features real-time bar height rendering, element highlight states (active comparison, pivot, swapped, sorted), adjustable animation speed, and custom comma-separated array input.
 - **Searching Algorithms**:
+<<<<<<< HEAD
   - `Linear Search`, `Binary Search`
   - Automatic pre-sorting for binary search, search window indicator, target value tracking, and step-by-step state logging.
 - **Graph Algorithms**:
   - `Breadth-First Search (BFS)`, `Depth-First Search (DFS)`, `Dijkstra's Shortest Path`, `Kruskal's MST`
+=======
+  - `Linear Search`, `Binary Search`, `Jump Search`
+  - Automatic pre-sorting for binary/jump searches, search window indicator, target value tracking, and step-by-step state logging.
+- **Graph Algorithms**:
+  - `Breadth-First Search (BFS)`, `Depth-First Search (DFS)`, `Dijkstra's Shortest Path`, `Prim's Minimum Spanning Tree (MST)`, `Kruskal's MST`
+>>>>>>> fed217333f11b4d98f082fe8fde3aa9b2dbf5650
   - Dynamic HTML5 Canvas rendering nodes, directed/undirected edges, edge weights, visited node tracking, priority queues, and disjoint-set cycle detection.
 
 ### 2. Data Structures Visualizer
@@ -110,6 +117,7 @@ A comprehensive command center (`/dashboard`) tailored to the student's learning
 ### 7. Automated PDF Report Generator
 Powered by **OpenPDF**, users can export clean, print-ready PDF reports on-demand for any algorithm:
 - Generates execution logs, performance statistics, Big-O complexity tables, and timestamped audit summaries.
+<<<<<<< HEAD
 
 ---
 
@@ -147,6 +155,12 @@ flowchart TD
 | Layer | Technologies Used |
 |---|---|
 | **Language & Runtime** | Java 21 LTS / Java 23 (Bytecode targeted to Java 21) |
+=======
+- 
+ Technologies Used 
+  
+| **Language & Runtime** | Java 21 LTS / Java 23 
+>>>>>>> fed217333f11b4d98f082fe8fde3aa9b2dbf5650
 | **Servlet Specification** | Jakarta EE 10 (Jakarta Servlet 6.0, JSP 3.1) |
 | **Application Server** | Apache Tomcat 10.1.x |
 | **Front-End Framework** | Bootstrap 5.3, Bootstrap Icons, Custom Dark Theme CSS |
@@ -166,8 +180,13 @@ AlgoVision/
 │   └── com/algovision/
 │       ├── algorithm/          # Core sorting, searching, and graph algorithm implementations
 │       │   ├── BubbleSort.java, QuickSort.java, MergeSort.java, HeapSort.java, ...
+<<<<<<< HEAD
 │       │   ├── LinearSearch.java, BinarySearch.java
 │       │   ├── BFS.java, DFS.java, Dijkstra.java, Kruskal.java
+=======
+│       │   ├── LinearSearch.java, BinarySearch.java, JumpSearch.java
+│       │   ├── BFS.java, DFS.java, Dijkstra.java, Prim.java, Kruskal.java
+>>>>>>> fed217333f11b4d98f082fe8fde3aa9b2dbf5650
 │       │   └── AlgorithmStep.java, GraphStep.java
 │       ├── controller/         # Jakarta HTTP Servlets
 │       │   ├── DashboardServlet.java, VisualizationServlet.java, AlgorithmServlet.java
@@ -292,6 +311,7 @@ You can test the application using the following pre-configured user accounts:
 | Role | Email | Password | Access Level |
 |---|---|---|---|
 | **Student (Default)** | `student@algovision.com` | `student123` | Full Access (Visualizers, Quizzes, Challenges, Dashboard) |
+<<<<<<< HEAD
 | **Admin** | `admin@algovision.com` | `admin123` | Administrator Portal (`/admin`), Metrics, System Management |
 
 *Note: Guest visitors can explore the platform without an explicit login; demo sessions default automatically to Student ID 2 (`Alex Student`).*
@@ -319,6 +339,8 @@ You can test the application using the following pre-configured user accounts:
 | `/admin` | `AdminServlet` | Platform metrics, execution counters, and user management |
 
 ---
+=======
+>>>>>>> fed217333f11b4d98f082fe8fde3aa9b2dbf5650
 
 ## 💡 Key Usability Tips
 
@@ -326,6 +348,7 @@ You can test the application using the following pre-configured user accounts:
 - **Dynamic Counter Update**: Whenever you run any sorting, searching, or graph algorithm in the visualizer, the **Algorithms Completed** counter on your dashboard increments automatically by 1, and that exact execution moves to the top of the **Recent Algorithm Visualizations** table.
 - **Instant PDF Downloads**: Every recent algorithm run in your dashboard includes an action button to instantly generate and download a comprehensive performance audit PDF.
 
+<<<<<<< HEAD
 ---
 
 ## 🤝 Contributing
@@ -342,3 +365,7 @@ Contributions are welcome! If you'd like to contribute new algorithms, data stru
 ## 📄 License
 
 This project is licensed under the **MIT License** — feel free to use, modify, and distribute for educational or commercial purposes.
+=======
+
+
+>>>>>>> fed217333f11b4d98f082fe8fde3aa9b2dbf5650
