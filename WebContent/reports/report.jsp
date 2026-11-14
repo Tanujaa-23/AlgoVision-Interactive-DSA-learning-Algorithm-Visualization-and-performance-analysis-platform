@@ -35,11 +35,11 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label text-info small fw-bold">INPUT DATA</label>
-                    <input type="text" name="inputData" class="form-control bg-dark text-light border-secondary" value="5, 2, 8, 1, 3" required>
+                    <input type="text" name="inputData" class="form-control bg-dark text-light border-secondary" value="5, 2, 8, 1, 3" placeholder="e.g. 5, 2, 8, 1, 3" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-info small fw-bold">SORTED / OUTPUT RESULT</label>
-                    <input type="text" name="outputData" class="form-control bg-dark text-light border-secondary" value="1, 2, 3, 5, 8" required>
+                    <label class="form-label text-info small fw-bold">SORTED / OUTPUT RESULT (AUTO-GENERATED IF BLANK)</label>
+                    <input type="text" name="outputData" class="form-control bg-dark text-light border-secondary" placeholder="Leave empty to auto-compute from input data">
                 </div>
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">

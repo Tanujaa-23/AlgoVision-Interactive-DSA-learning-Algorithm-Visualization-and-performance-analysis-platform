@@ -3,7 +3,7 @@ package com.algovision.algorithm;
 import java.util.List;
 
 /**
- * Execution step payload emitted by Graph algorithms (BFS, DFS, Dijkstra, Prim, Kruskal).
+ * Execution step payload emitted by Graph algorithms (BFS, DFS, Dijkstra, Kruskal).
  */
 public class GraphStep {
 

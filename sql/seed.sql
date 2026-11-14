@@ -2,7 +2,6 @@
 
 -- Standard Admin and Demo Student Users (Passwords hashed using SHA-256 for 'admin123' and 'student123')
 INSERT INTO users (name, email, password, role, streak_days) VALUES
-('System Administrator', 'admin@algovision.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'ADMIN', 15),
 ('Alex Student', 'student@algovision.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'STUDENT', 7)
 ON CONFLICT (email) DO NOTHING;
 
@@ -26,11 +25,9 @@ INSERT INTO algorithms (name, category, description, how_it_works, complexity_be
 ('Heap Sort', 'Sorting', 'Heap Sort converts the array into a Binary Max Heap and repeatedly extracts the maximum element.', 'Builds a max heap from the array, swaps the root (max element) with the last element, reduces heap size, and re-heapifies.', 'O(n log n)', 'O(n log n)', 'O(n log n)', 'O(1)', FALSE, TRUE),
 ('Linear Search', 'Searching', 'Linear Search sequentially checks each element of the list until a match is found or the end is reached.', 'Iterates sequentially from index 0 to n-1 comparing target with each array element.', 'O(1)', 'O(n)', 'O(n)', 'O(1)', TRUE, TRUE),
 ('Binary Search', 'Searching', 'Binary Search finds the position of a target value within a sorted array using divide-and-conquer.', 'Compares target with the middle element. If smaller, searches left half; if larger, searches right half.', 'O(1)', 'O(log n)', 'O(log n)', 'O(1)', TRUE, TRUE),
-('Jump Search', 'Searching', 'Jump Search checks fewer elements than linear search by jumping ahead by fixed steps in a sorted array.', 'Jumps ahead by step size m = √n. Once an element larger than target is reached, performs linear search backwards.', 'O(1)', 'O(√n)', 'O(√n)', 'O(1)', TRUE, TRUE),
 ('Breadth-First Search (BFS)', 'Graph', 'BFS traverses or searches tree/graph data structures level by level using a FIFO Queue.', 'Starts at source node, visits all immediate neighbors, enqueues them, and continues level by level.', 'O(V + E)', 'O(V + E)', 'O(V + E)', 'O(V)', TRUE, FALSE),
 ('Depth-First Search (DFS)', 'Graph', 'DFS explores as far as possible along each branch before backtracking using a Stack / Recursion.', 'Starts at root/source, marks as visited, and recursively explores each unvisited adjacent node.', 'O(V + E)', 'O(V + E)', 'O(V + E)', 'O(V)', TRUE, FALSE),
 ('Dijkstra Shortest Path', 'Graph', 'Dijkstra finds the shortest path between nodes in a weighted graph with non-negative edge weights.', 'Maintains a distance array initialized to infinity. Uses a priority queue to extract the unvisited node with minimum distance and relaxes its neighbors.', 'O((V + E) log V)', 'O((V + E) log V)', 'O((V + E) log V)', 'O(V)', TRUE, FALSE),
-('Prim Minimum Spanning Tree', 'Graph', 'Prim algorithm builds a Minimum Spanning Tree for a weighted undirected graph starting from an arbitrary vertex.', 'Grows MST one vertex at a time by picking the minimum weight edge connecting a visited node to an unvisited node.', 'O(E log V)', 'O(E log V)', 'O(E log V)', 'O(V)', TRUE, FALSE),
 ('Kruskal MST', 'Graph', 'Kruskal algorithm finds MST by sorting all edges by weight and adding non-cycle edges using Disjoint Set (Union-Find).', 'Sorts all edges in ascending order of weight. Adds edges one by one to MST if they do not form a cycle (using Union-Find).', 'O(E log E)', 'O(E log E)', 'O(E log E)', 'O(V + E)', TRUE, FALSE)
 ON CONFLICT (name) DO NOTHING;
 

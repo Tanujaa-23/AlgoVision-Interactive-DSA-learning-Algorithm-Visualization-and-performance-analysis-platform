@@ -84,10 +84,10 @@ public class ProgressDAO {
 
     public static int getTopicLimit(String topic) {
         if ("Sorting".equalsIgnoreCase(topic)) return 6;
-        if ("Searching".equalsIgnoreCase(topic)) return 3;
-        if ("Graph".equalsIgnoreCase(topic)) return 5;
+        if ("Searching".equalsIgnoreCase(topic)) return 2;
+        if ("Graph".equalsIgnoreCase(topic)) return 4;
         if ("Data Structures".equalsIgnoreCase(topic)) return 4;
-        return 5;
+        return 4;
     }
 
     private static Achievement createAchievement(int id, String key, String title, String desc, String icon) {
@@ -105,8 +105,8 @@ public class ProgressDAO {
         memoryProgress.computeIfAbsent(targetUser, k -> {
             Map<String, UserProgress> map = new LinkedHashMap<>();
             map.put("Sorting", new UserProgress(targetUser, "Sorting", 0, 6));
-            map.put("Searching", new UserProgress(targetUser, "Searching", 0, 3));
-            map.put("Graph", new UserProgress(targetUser, "Graph", 0, 5));
+            map.put("Searching", new UserProgress(targetUser, "Searching", 0, 2));
+            map.put("Graph", new UserProgress(targetUser, "Graph", 0, 4));
             map.put("Data Structures", new UserProgress(targetUser, "Data Structures", 0, 4));
             return map;
         });

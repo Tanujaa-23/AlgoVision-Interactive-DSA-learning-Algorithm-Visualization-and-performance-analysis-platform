@@ -30,12 +30,10 @@ public class AlgorithmDAO {
 
         addMem("Linear Search", "Searching", "Linear Search checks every element sequentially until target is found.", "Loops from index 0 to n-1 matching target value.", "O(1)", "O(n)", "O(n)", "O(1)", true, true);
         addMem("Binary Search", "Searching", "Binary Search divides sorted search space in half repeatedly.", "Compares target with middle element; eliminates half the array each step.", "O(1)", "O(log n)", "O(log n)", "O(1)", true, true);
-        addMem("Jump Search", "Searching", "Jump Search checks fixed block steps in a sorted array then performs linear search.", "Jumps ahead by √n steps, then linear searches backward.", "O(1)", "O(√n)", "O(√n)", "O(1)", true, true);
 
         addMem("Breadth-First Search (BFS)", "Graph", "BFS traverses graph level by level using a FIFO queue.", "Visits source, enqueues neighbors, explores breadth before depth.", "O(V + E)", "O(V + E)", "O(V + E)", "O(V)", true, false);
         addMem("Depth-First Search (DFS)", "Graph", "DFS explores graph branches deeply before backtracking using a stack.", "Visits source, explores deep path recursively until dead end.", "O(V + E)", "O(V + E)", "O(V + E)", "O(V)", true, false);
         addMem("Dijkstra Shortest Path", "Graph", "Dijkstra computes single-source shortest path in weighted graph with non-negative weights.", "Uses Priority Queue to greedily pick closest unvisited node and relax edges.", "O((V + E) log V)", "O((V + E) log V)", "O((V + E) log V)", "O(V)", true, false);
-        addMem("Prim Minimum Spanning Tree", "Graph", "Prim builds minimum spanning tree for connected weighted undirected graph.", "Grows MST vertex by vertex adding lowest weight edge across cut.", "O(E log V)", "O(E log V)", "O(E log V)", "O(V)", true, false);
         addMem("Kruskal MST", "Graph", "Kruskal builds MST by sorting edges and joining components with Disjoint Set.", "Sorts edges by weight, adds edge if it does not form a cycle.", "O(E log E)", "O(E log E)", "O(E log E)", "O(V + E)", true, false);
     }
 
@@ -119,9 +117,6 @@ public class AlgorithmDAO {
         if (lower.contains("dijkstra")) {
             return memoryAlgos.get("dijkstra shortest path");
         }
-        if (lower.contains("prim")) {
-            return memoryAlgos.get("prim minimum spanning tree");
-        }
         if (lower.contains("kruskal")) {
             return memoryAlgos.get("kruskal mst");
         }
@@ -130,9 +125,6 @@ public class AlgorithmDAO {
         }
         if (lower.contains("linear")) {
             return memoryAlgos.get("linear search");
-        }
-        if (lower.contains("jump")) {
-            return memoryAlgos.get("jump search");
         }
 
         return null;

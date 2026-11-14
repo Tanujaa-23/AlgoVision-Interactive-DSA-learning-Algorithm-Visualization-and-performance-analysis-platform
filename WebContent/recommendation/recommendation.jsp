@@ -47,10 +47,9 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Shortest path on road map with road weights and distances')">Dijkstra Shortest Path</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Traverse graph level by level to find nearest friends in social network')">BFS Level Order</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Explore a maze and detect cycles using backtracking')">DFS Maze / Cycle</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Connect all computer network servers with minimum total cable wire (MST)')">Prim / Kruskal MST</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Connect all computer network servers with minimum total cable wire (MST)')">Kruskal MST</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Search target number in an unsorted random array sequentially')">Linear Search</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Quickly find element in sorted dictionary in logarithmic O(log n) time')">Binary Search</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Search sorted array by jumping blocks of square root size')">Jump Search</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Fastest in-place partitioning sorting algorithm for large arrays')">Quick Sort</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Guaranteed O(n log n) stable sorting preserving identical element order')">Merge Sort</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Sort nearly sorted streaming cards data one item at a time')">Insertion Sort</button>

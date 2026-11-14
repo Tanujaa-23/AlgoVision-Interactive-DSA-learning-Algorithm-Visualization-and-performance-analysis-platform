@@ -68,7 +68,7 @@ public class VisualizationServlet extends HttpServlet {
 
         // Check Graph algorithms first (avoids "Breadth-First Search" being caught by "search")
         if (lower.contains("bfs") || lower.contains("dfs")
-                || lower.contains("dijkstra") || lower.contains("prim")
+                || lower.contains("dijkstra")
                 || lower.contains("kruskal") || lower.contains("breadth-first")
                 || lower.contains("depth-first") || lower.contains("shortest path")
                 || lower.contains("spanning tree") || lower.contains("mst")
@@ -78,7 +78,7 @@ public class VisualizationServlet extends HttpServlet {
 
         // Check Searching algorithms
         if (lower.contains("linear") || lower.contains("binary")
-                || lower.contains("jump") || lower.contains("search")) {
+                || lower.contains("search")) {
             return "searching";
         }
 
@@ -121,64 +121,108 @@ public class VisualizationServlet extends HttpServlet {
         if ("Sorting".equalsIgnoreCase(category)) {
             int[] arr;
             try {
-                arr = ValidationUtil.parseIntegerArray(inputStr != null ? inputStr : "5, 2, 8, 1, 3");
+                arr = ValidationUtil.parseIntegerArray(inputStr != null ? inputStr : "5, 2, 8, 1, 3, 9, 4, 7");
             } catch (Exception e) {
-                arr = new int[]{5, 2, 8, 1, 3};
+                arr = new int[]{5, 2, 8, 1, 3, 9, 4, 7};
             }
             List<AlgorithmStep> steps = algorithmService.executeSortingAlgorithm(algoName, arr, userId);
             out.print(gson.toJson(steps));
 
         } else if ("Searching".equalsIgnoreCase(category)) {
             int[] arr;
-            int target = 8;
+            int target = 5;
             try {
                 String targetStr = request.getParameter("target");
                 if (targetStr != null && !targetStr.trim().isEmpty()) {
                     target = Integer.parseInt(targetStr.trim());
                 }
-                arr = ValidationUtil.parseIntegerArray(inputStr != null ? inputStr : "1, 2, 5, 8, 12, 16");
+                arr = ValidationUtil.parseIntegerArray(inputStr != null ? inputStr : "1, 2, 3, 4, 5, 6, 7, 8, 9");
             } catch (Exception e) {
-                arr = new int[]{1, 2, 5, 8, 12, 16};
+                arr = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
             }
             List<AlgorithmStep> steps = algorithmService.executeSearchingAlgorithm(algoName, arr, target, userId);
             out.print(gson.toJson(steps));
 
         } else if ("Graph".equalsIgnoreCase(category)) {
             long startTime = System.nanoTime();
-            Map<String, List<String>> adjList = new HashMap<>();
-            adjList.put("A", Arrays.asList("B", "C"));
-            adjList.put("B", Arrays.asList("A", "C", "D"));
-            adjList.put("C", Arrays.asList("A", "B", "D"));
-            adjList.put("D", Arrays.asList("B", "C"));
+
+            // Parse custom graph nodes / numbers from inputStr (e.g. "1, 2, 3, 4, 5, 6, 7, 8, 9" or any custom numbers/nodes)
+            List<String> nodeList = new ArrayList<>();
+            if (inputStr != null && !inputStr.trim().isEmpty()) {
+                String[] parts = inputStr.trim().split("[,\\s]+");
+                for (String p : parts) {
+                    String clean = p.trim().toUpperCase();
+                    if (!clean.isEmpty() && !nodeList.contains(clean)) {
+                        nodeList.add(clean);
+                    }
+                }
+            }
+            if (nodeList.isEmpty()) {
+                nodeList = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9");
+            }
+
+            if (startNode == null || !nodeList.contains(startNode)) {
+                startNode = nodeList.get(0);
+            }
+
+            int N = nodeList.size();
+            Map<String, List<String>> adjList = new LinkedHashMap<>();
+            Map<String, List<Dijkstra.Edge>> dijkstraGraph = new LinkedHashMap<>();
+            Set<String> nodes = new LinkedHashSet<>(nodeList);
+            List<Kruskal.Edge> edges = new ArrayList<>();
+
+            for (String node : nodeList) {
+                adjList.put(node, new ArrayList<>());
+                dijkstraGraph.put(node, new ArrayList<>());
+            }
+
+            // Create connections (ring + cross chords) to form a rich, connected graph
+            Set<String> addedEdges = new HashSet<>();
+            for (int i = 0; i < N; i++) {
+                String u = nodeList.get(i);
+                int[] neighborIndices;
+                if (N == 1) {
+                    neighborIndices = new int[]{};
+                } else if (N == 2) {
+                    neighborIndices = new int[]{(i + 1) % N};
+                } else if (N <= 4) {
+                    neighborIndices = new int[]{(i + 1) % N, (i + 2) % N};
+                } else {
+                    neighborIndices = new int[]{(i + 1) % N, (i + 2) % N, (i + N / 2) % N};
+                }
+
+                for (int ni : neighborIndices) {
+                    if (ni == i) continue;
+                    String v = nodeList.get(ni);
+                    String edgeKey1 = u + "-" + v;
+                    String edgeKey2 = v + "-" + u;
+                    if (!addedEdges.contains(edgeKey1) && !addedEdges.contains(edgeKey2)) {
+                        addedEdges.add(edgeKey1);
+                        double weight = ((i * 3 + ni * 5) % 9) + 2.0;
+                        if (weight < 1.0) weight = 2.0;
+
+                        adjList.get(u).add(v);
+                        adjList.get(v).add(u);
+
+                        dijkstraGraph.get(u).add(new Dijkstra.Edge(v, weight));
+                        dijkstraGraph.get(v).add(new Dijkstra.Edge(u, weight));
+
+                        edges.add(new Kruskal.Edge(u, v, weight));
+                    }
+                }
+            }
 
             List<GraphStep> steps;
             String lowerAlgo = algoName.toLowerCase();
             if (lowerAlgo.contains("dfs") || lowerAlgo.contains("depth")) {
                 steps = DFS.runWithSteps(adjList, startNode);
             } else if (lowerAlgo.contains("dijkstra") || lowerAlgo.contains("shortest")) {
-                Map<String, List<Dijkstra.Edge>> graph = new HashMap<>();
-                graph.put("A", Arrays.asList(new Dijkstra.Edge("B", 4), new Dijkstra.Edge("C", 2)));
-                graph.put("B", Arrays.asList(new Dijkstra.Edge("A", 4), new Dijkstra.Edge("C", 1), new Dijkstra.Edge("D", 5)));
-                graph.put("C", Arrays.asList(new Dijkstra.Edge("A", 2), new Dijkstra.Edge("B", 1), new Dijkstra.Edge("D", 8)));
-                graph.put("D", Arrays.asList(new Dijkstra.Edge("B", 5), new Dijkstra.Edge("C", 8)));
-                String endNode = "D".equals(startNode) ? "A" : "D";
-                steps = Dijkstra.runWithSteps(graph, startNode, endNode);
-            } else if (lowerAlgo.contains("prim")) {
-                Map<String, List<Prim.Edge>> primGraph = new HashMap<>();
-                primGraph.put("A", Arrays.asList(new Prim.Edge("A", "B", 4), new Prim.Edge("A", "C", 2)));
-                primGraph.put("B", Arrays.asList(new Prim.Edge("B", "A", 4), new Prim.Edge("B", "C", 1), new Prim.Edge("B", "D", 5)));
-                primGraph.put("C", Arrays.asList(new Prim.Edge("C", "A", 2), new Prim.Edge("C", "B", 1), new Prim.Edge("C", "D", 8)));
-                primGraph.put("D", Arrays.asList(new Prim.Edge("D", "B", 5), new Prim.Edge("D", "C", 8)));
-                steps = Prim.runWithSteps(primGraph, startNode);
+                String endNode = nodeList.get(nodeList.size() - 1);
+                if (startNode.equals(endNode) && N > 1) {
+                    endNode = nodeList.get((nodeList.indexOf(startNode) + 1) % N);
+                }
+                steps = Dijkstra.runWithSteps(dijkstraGraph, startNode, endNode);
             } else if (lowerAlgo.contains("kruskal")) {
-                Set<String> nodes = new HashSet<>(Arrays.asList("A", "B", "C", "D"));
-                List<Kruskal.Edge> edges = Arrays.asList(
-                    new Kruskal.Edge("A", "B", 4),
-                    new Kruskal.Edge("A", "C", 2),
-                    new Kruskal.Edge("B", "C", 1),
-                    new Kruskal.Edge("B", "D", 5),
-                    new Kruskal.Edge("C", "D", 8)
-                );
                 steps = Kruskal.runWithSteps(nodes, edges);
             } else {
                 steps = BFS.runWithSteps(adjList, startNode);
@@ -191,7 +235,7 @@ public class VisualizationServlet extends HttpServlet {
                 com.algovision.model.Execution exec = new com.algovision.model.Execution();
                 exec.setUserId(userId);
                 exec.setAlgorithmName(algoName);
-                exec.setInputData("Start: " + startNode + ", Graph: A-B(4), A-C(2), B-C(1), B-D(5), C-D(8)");
+                exec.setInputData("Nodes: " + nodeList + ", Start: " + startNode);
                 exec.setStepCount(steps.size());
                 exec.setComparisonCount(steps.size());
                 exec.setSwapCount(0);

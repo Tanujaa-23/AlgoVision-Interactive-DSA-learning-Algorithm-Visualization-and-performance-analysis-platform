@@ -50,13 +50,13 @@ public class Execution {
         if (algorithmName == null) return "Sorting";
         String lower = algorithmName.toLowerCase();
         if (lower.contains("bfs") || lower.contains("dfs") || lower.contains("dijkstra")
-                || lower.contains("prim") || lower.contains("kruskal") || lower.contains("breadth")
+                || lower.contains("kruskal") || lower.contains("breadth")
                 || lower.contains("depth") || lower.contains("shortest") || lower.contains("mst")
                 || lower.contains("graph")) {
             return "Graph";
         }
         if (lower.contains("linear") || lower.contains("binary")
-                || lower.contains("jump") || lower.contains("search")) {
+                || lower.contains("search")) {
             return "Searching";
         }
         return "Sorting";

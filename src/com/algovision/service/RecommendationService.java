@@ -60,17 +60,11 @@ public class RecommendationService {
         if (q.contains("binary search") || q.contains("bisection") || q.contains("binary")) {
             return binarySearchResult();
         }
-        if (q.contains("jump search") || q.contains("block search") || q.contains("jump")) {
-            return jumpSearchResult();
-        }
         if (q.contains("dijkstra")) {
             return dijkstraResult();
         }
         if (q.contains("kruskal")) {
             return kruskalResult();
-        }
-        if (q.contains("prim")) {
-            return primResult();
         }
         if (q.contains("bfs") || q.contains("breadth")) {
             return bfsResult();
@@ -84,11 +78,7 @@ public class RecommendationService {
         // ==========================================
         // Minimum Spanning Tree
         if (q.contains("spanning tree") || q.contains("mst") || q.contains("connect all cities") || q.contains("minimum cable")) {
-            if (q.contains("edge") || q.contains("sparse") || q.contains("union") || q.contains("disjoint")) {
-                return kruskalResult();
-            } else {
-                return primResult();
-            }
+            return kruskalResult();
         }
 
         // Weighted Shortest Path / GPS / Routing
@@ -126,13 +116,8 @@ public class RecommendationService {
         }
 
         // Sorted searching / Logarithmic
-        if ((q.contains("search") || q.contains("find") || q.contains("locate") || q.contains("lookup")) && (q.contains("sorted") || q.contains("ordered") || q.contains("log") || q.contains("divide"))) {
+        if ((q.contains("search") || q.contains("find") || q.contains("locate") || q.contains("lookup")) && (q.contains("sorted") || q.contains("ordered") || q.contains("log") || q.contains("divide") || q.contains("block") || q.contains("sqrt"))) {
             return binarySearchResult();
-        }
-
-        // Jump / Block search
-        if (q.contains("square root") || q.contains("sqrt") || q.contains("block")) {
-            return jumpSearchResult();
         }
 
         // General Search / Find query
@@ -263,16 +248,6 @@ public class RecommendationService {
         );
     }
 
-    private RecommendationResult jumpSearchResult() {
-        return new RecommendationResult(
-            "Jump Search",
-            "Searching",
-            "Jump Search skips ahead by fixed √n blocks in a sorted array before performing a local linear search, requiring fewer comparisons than linear search with lower overhead than binary search.",
-            "O(1) Best / O(√n) Worst",
-            "O(1)"
-        );
-    }
-
     private RecommendationResult dijkstraResult() {
         return new RecommendationResult(
             "Dijkstra's Algorithm",
@@ -299,16 +274,6 @@ public class RecommendationService {
             "Graph",
             "DFS explores as far as possible along each branch before backtracking using a stack. Optimal for maze pathfinding, cycle detection, connected components, and topological sorting.",
             "O(V + E) in all cases",
-            "O(V)"
-        );
-    }
-
-    private RecommendationResult primResult() {
-        return new RecommendationResult(
-            "Prim's Algorithm",
-            "Graph",
-            "Prim's Algorithm grows a single Minimum Spanning Tree (MST) from an arbitrary root by repeatedly adding the cheapest edge across the cut. Best suited for dense graphs.",
-            "O(E log V)",
             "O(V)"
         );
     }

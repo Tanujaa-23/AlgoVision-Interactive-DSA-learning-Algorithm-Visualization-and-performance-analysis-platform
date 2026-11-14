@@ -1,5 +1,6 @@
 /**
  * AlgoVision Pro - Interactive Algorithm Visualization Engine
+ * Supports custom numeric inputs and dynamic result display for Sorting & Searching
  */
 
 class VisualizerEngine {
@@ -11,13 +12,25 @@ class VisualizerEngine {
         this.isPlaying = false;
         this.speed = 300; // ms per step
         this.timer = null;
+        this.category = "Sorting";
     }
 
-    setSteps(steps) {
+    setSteps(steps, category = "Sorting") {
         this.steps = steps || [];
+        this.category = category;
         this.currentStepIdx = 0;
         this.pause();
         if (this.logContainer) this.logContainer.innerHTML = "";
+
+        const banner = document.getElementById("finalResultBanner");
+        if (banner) banner.classList.add("d-none");
+
+        const statusEl = document.getElementById("visualStatus");
+        if (statusEl) {
+            statusEl.innerText = "Ready";
+            statusEl.className = "text-success h4";
+        }
+
         this.renderStep(0);
     }
 
@@ -27,16 +40,79 @@ class VisualizerEngine {
         this.currentStepIdx = idx;
         const step = this.steps[idx];
 
-        // Update counters if element exist
+        // Update metric counters
         const compEl = document.getElementById("comparisonCount");
         const swapEl = document.getElementById("swapCount");
         const stepEl = document.getElementById("stepCounter");
         const descEl = document.getElementById("stepDescription");
+        const statusEl = document.getElementById("visualStatus");
 
         if (compEl) compEl.innerText = step.comparisonCount || 0;
         if (swapEl) swapEl.innerText = step.swapCount || 0;
         if (stepEl) stepEl.innerText = `${step.stepNumber || (idx + 1)} / ${this.steps.length}`;
         if (descEl) descEl.innerText = step.description || "";
+
+        const isLast = (idx === this.steps.length - 1);
+        const action = step.action || "";
+
+        // Status update
+        if (statusEl) {
+            if (action === "found") {
+                statusEl.innerText = "Target Found";
+                statusEl.className = "text-success h4";
+            } else if (action === "not_found") {
+                statusEl.innerText = "Not Found";
+                statusEl.className = "text-danger h4";
+            } else if (action === "complete" || isLast) {
+                statusEl.innerText = "Completed";
+                statusEl.className = "text-success h4";
+            } else if (this.isPlaying) {
+                statusEl.innerText = "Running";
+                statusEl.className = "text-warning h4";
+            } else {
+                statusEl.innerText = "Paused";
+                statusEl.className = "text-info h4";
+            }
+        }
+
+        // Final Result Display in Banner
+        const banner = document.getElementById("finalResultBanner");
+        const resText = document.getElementById("finalResultText");
+        const resTitle = document.getElementById("finalResultTitle");
+        const resBadge = document.getElementById("finalResultBadge");
+        const targetInput = document.getElementById("targetInput");
+        const targetVal = targetInput ? targetInput.value : "";
+
+        if (banner && resText) {
+            if (action === "complete" || (isLast && this.category === "Sorting")) {
+                banner.classList.remove("d-none");
+                banner.classList.add("d-flex");
+                if (resTitle) resTitle.innerText = "Array Fully Sorted!";
+                resText.innerText = "Final Sorted Result: [ " + (step.array || []).join(", ") + " ]";
+                if (resBadge) {
+                    resBadge.innerText = "Sorted Result";
+                    resBadge.className = "badge bg-success px-3 py-2";
+                }
+            } else if (action === "found") {
+                banner.classList.remove("d-none");
+                banner.classList.add("d-flex");
+                if (resTitle) resTitle.innerText = "Target Element Located!";
+                resText.innerText = `Search Result: Target value ${targetVal || step.index1} found at index ${step.index1}!`;
+                if (resBadge) {
+                    resBadge.innerText = "Found";
+                    resBadge.className = "badge bg-success px-3 py-2";
+                }
+            } else if (action === "not_found") {
+                banner.classList.remove("d-none");
+                banner.classList.add("d-flex");
+                if (resTitle) resTitle.innerText = "Target Not Found";
+                resText.innerText = `Search Result: Target value ${targetVal} is NOT present in the array.`;
+                if (resBadge) {
+                    resBadge.innerText = "Not Found";
+                    resBadge.className = "badge bg-danger px-3 py-2";
+                }
+            }
+        }
 
         // Log entry
         if (this.logContainer) {
@@ -50,26 +126,28 @@ class VisualizerEngine {
         // Render Array Bars
         this.container.innerHTML = "";
         const arr = step.array || [];
+        const minVal = Math.min(...arr, 0);
         const maxVal = Math.max(...arr, 1);
+        const range = (maxVal - minVal) || 1;
 
         arr.forEach((val, i) => {
             const bar = document.createElement("div");
             bar.className = "array-bar";
 
-            // Calculate height percentage
-            const pct = Math.max(15, Math.round((val / maxVal) * 80));
+            // Calculate height percentage normalized for user's numbers
+            const pct = Math.max(16, Math.round(((val - minVal) / range) * 80));
             bar.style.height = `${pct}%`;
             bar.innerText = val;
 
             // Highlight based on action & index
-            if (step.action === "complete") {
+            if (action === "complete" || (isLast && this.category === "Sorting")) {
                 bar.classList.add("sorted");
             } else if (i === step.pivotIndex) {
                 bar.classList.add("pivot");
             } else if (i === step.index1 || i === step.index2) {
-                if (step.action === "compare") bar.classList.add("comparing");
-                else if (step.action === "swap") bar.classList.add("swapping");
-                else if (step.action === "found") bar.classList.add("sorted");
+                if (action === "compare") bar.classList.add("comparing");
+                else if (action === "swap") bar.classList.add("swapping");
+                else if (action === "found") bar.classList.add("sorted");
             }
 
             this.container.appendChild(bar);
@@ -79,11 +157,30 @@ class VisualizerEngine {
     play() {
         if (this.isPlaying) return;
         this.isPlaying = true;
+        const statusEl = document.getElementById("visualStatus");
+        if (statusEl) {
+            statusEl.innerText = "Running";
+            statusEl.className = "text-warning h4";
+        }
         this.timer = setInterval(() => {
             if (this.currentStepIdx < this.steps.length - 1) {
                 this.renderStep(this.currentStepIdx + 1);
             } else {
                 this.pause();
+                const sEl = document.getElementById("visualStatus");
+                if (sEl) {
+                    const lastStep = this.steps[this.steps.length - 1];
+                    if (lastStep && lastStep.action === "found") {
+                        sEl.innerText = "Target Found";
+                        sEl.className = "text-success h4";
+                    } else if (lastStep && lastStep.action === "not_found") {
+                        sEl.innerText = "Not Found";
+                        sEl.className = "text-danger h4";
+                    } else {
+                        sEl.innerText = "Completed";
+                        sEl.className = "text-success h4";
+                    }
+                }
             }
         }, this.speed);
     }
@@ -93,6 +190,11 @@ class VisualizerEngine {
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
+        }
+        const statusEl = document.getElementById("visualStatus");
+        if (statusEl && this.steps && this.currentStepIdx < this.steps.length - 1) {
+            statusEl.innerText = "Paused";
+            statusEl.className = "text-info h4";
         }
     }
 
@@ -113,11 +215,18 @@ class VisualizerEngine {
     reset() {
         this.pause();
         if (this.logContainer) this.logContainer.innerHTML = "";
+        const statusEl = document.getElementById("visualStatus");
+        if (statusEl) {
+            statusEl.innerText = "Ready";
+            statusEl.className = "text-success h4";
+        }
+        const banner = document.getElementById("finalResultBanner");
+        if (banner) banner.classList.add("d-none");
         this.renderStep(0);
     }
 
     setSpeed(newSpeedMs) {
-        this.speed = newSpeedMs;
+        this.speed = Math.max(50, newSpeedMs);
         if (this.isPlaying) {
             this.pause();
             this.play();

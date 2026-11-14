@@ -54,33 +54,33 @@
 
         <!-- Top Configuration Bar -->
         <div class="card card-custom p-4 mb-4">
-            <form id="graphForm" class="row g-3 align-items-center">
-                <div class="col-md-4">
+            <form id="graphForm" class="row g-3 align-items-center" onsubmit="event.preventDefault(); runGraphAlgo(true);">
+                <div class="col-md-3">
                     <label class="form-label text-info small fw-bold">SELECT GRAPH ALGORITHM</label>
                     <select id="graphAlgoSelect" class="form-select bg-dark text-light border-secondary">
                         <option value="BFS" ${empty selectedAlgo || "BFS".equalsIgnoreCase(selectedAlgo) || selectedAlgo.toLowerCase().contains("breadth") ? "selected" : ""}>Breadth-First Search (BFS)</option>
                         <option value="DFS" ${"DFS".equalsIgnoreCase(selectedAlgo) || selectedAlgo.toLowerCase().contains("depth") ? "selected" : ""}>Depth-First Search (DFS)</option>
                         <option value="Dijkstra" ${"Dijkstra".equalsIgnoreCase(selectedAlgo) || selectedAlgo.toLowerCase().contains("dijkstra") || selectedAlgo.toLowerCase().contains("shortest") ? "selected" : ""}>Dijkstra Shortest Path</option>
-                        <option value="Prim" ${"Prim".equalsIgnoreCase(selectedAlgo) || selectedAlgo.toLowerCase().contains("prim") ? "selected" : ""}>Prim's Minimum Spanning Tree (MST)</option>
                         <option value="Kruskal" ${"Kruskal".equalsIgnoreCase(selectedAlgo) || selectedAlgo.toLowerCase().contains("kruskal") ? "selected" : ""}>Kruskal's MST</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label text-info small fw-bold">SOURCE ROOT NODE</label>
+                <div class="col-md-4">
+                    <label class="form-label text-info small fw-bold">GRAPH NODES / NUMBERS</label>
+                    <input type="text" id="graphNodesInput" class="form-control bg-dark text-light border-secondary" value="1, 2, 3, 4, 5, 6, 7, 8, 9" placeholder="e.g. 1, 2, 3, 4, 5, 6, 7, 8, 9">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-info small fw-bold">SOURCE ROOT</label>
                     <select id="startNodeSelect" class="form-select bg-dark text-light border-secondary">
-                        <option value="A" selected>Node A (Source)</option>
-                        <option value="B">Node B</option>
-                        <option value="C">Node C</option>
-                        <option value="D">Node D</option>
+                        <option value="1" selected>Node 1 (Source)</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label text-info small fw-bold">ANIMATION SPEED</label>
                     <input type="range" class="form-range" id="graphSpeedRange" min="100" max="1500" step="50" value="500" onchange="if(graphVis) graphVis.setSpeed(1600 - this.value)">
                 </div>
-                <div class="col-md-2 text-end">
+                <div class="col-md-1 text-end">
                     <label class="form-label d-block">&nbsp;</label>
-                    <button type="button" class="btn btn-primary-custom w-100" onclick="runGraphAlgo(true)"><i class="bi bi-play-circle-fill me-1"></i>Run</button>
+                    <button type="submit" class="btn btn-primary-custom w-100" title="Run Graph Algorithm"><i class="bi bi-play-circle-fill"></i></button>
                 </div>
             </form>
         </div>
@@ -111,6 +111,18 @@
                     <strong id="visualStatus" class="text-success h4">Ready</strong>
                 </div>
             </div>
+        </div>
+
+        <!-- Graph Final Result Banner -->
+        <div id="finalResultBanner" class="alert alert-success border border-success d-none align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-diagram-3-fill text-success fs-4"></i>
+                <div>
+                    <strong id="finalResultTitle" class="d-block text-white">Graph Execution Completed</strong>
+                    <span id="finalResultText" class="text-light small">Result details</span>
+                </div>
+            </div>
+            <span id="finalResultBadge" class="badge bg-success px-3 py-2">Result</span>
         </div>
 
         <div class="row g-4 mb-4">
@@ -155,8 +167,47 @@
     <script src="${pageContext.request.contextPath}/js/graph.js"></script>
     <script>
         let graphVis = null;
+
+        function getParsedNodes() {
+            const inputEl = document.getElementById("graphNodesInput");
+            const val = inputEl ? inputEl.value.trim() : "";
+            if (!val) return ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+            const tokens = val.split(/[,\s]+/).map(t => t.trim().toUpperCase()).filter(t => t.length > 0);
+            const unique = [];
+            tokens.forEach(t => { if (!unique.includes(t)) unique.push(t); });
+            return unique.length > 0 ? unique : ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        }
+
+        function updateStartNodeOptions() {
+            const startSelect = document.getElementById("startNodeSelect");
+            if (!startSelect) return;
+            const currentSelected = startSelect.value;
+            const nodes = getParsedNodes();
+
+            startSelect.innerHTML = "";
+            nodes.forEach((node, idx) => {
+                const opt = document.createElement("option");
+                opt.value = node;
+                opt.innerText = "Node " + node + (idx === 0 ? " (Source)" : "");
+                if (node === currentSelected || (idx === 0 && !nodes.includes(currentSelected))) {
+                    opt.selected = true;
+                }
+                startSelect.appendChild(opt);
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             graphVis = new GraphCanvasVisualizer("graphCanvas", "logContainer");
+
+            updateStartNodeOptions();
+
+            const nodesInput = document.getElementById("graphNodesInput");
+            if (nodesInput) {
+                nodesInput.addEventListener("change", () => {
+                    updateStartNodeOptions();
+                    runGraphAlgo(false);
+                });
+            }
 
             const algoSelect = document.getElementById("graphAlgoSelect");
             if (algoSelect) {
@@ -176,12 +227,24 @@
             const algoSelect = document.getElementById("graphAlgoSelect");
             if (!algoSelect) return;
             const algo = algoSelect.value;
-            const start = document.getElementById("startNodeSelect") ? document.getElementById("startNodeSelect").value : "A";
+            const nodes = getParsedNodes();
+            const startSelect = document.getElementById("startNodeSelect");
+            const start = (startSelect && startSelect.value) ? startSelect.value : nodes[0];
+
+            // Rebuild canvas structure with user's nodes
+            if (graphVis) {
+                graphVis.buildGraphFromNodes(nodes);
+            }
+
+            // Hide previous result banner until completion
+            const banner = document.getElementById("finalResultBanner");
+            if (banner) banner.classList.add("d-none");
 
             const params = new URLSearchParams();
             params.append("category", "Graph");
             params.append("algorithm", algo);
             params.append("startNode", start);
+            params.append("inputData", nodes.join(", "));
 
             const contextPath = window.contextPath || "";
             const endpoint = contextPath ? (contextPath + "/visualize") : "visualize";
@@ -194,7 +257,7 @@
             .then(res => res.json())
             .then(steps => {
                 if (graphVis) {
-                    graphVis.setSteps(steps);
+                    graphVis.setSteps(steps, algo);
                     const urlParams = new URLSearchParams(window.location.search);
                     const isRunRequested = shouldAutoPlay || urlParams.get("run") === "true";
                     if (isRunRequested) {
@@ -206,7 +269,16 @@
                     }
                 }
             })
-            .catch(err => console.error("Error executing graph algorithm:", err));
+            .catch(err => {
+                console.warn("Backend fetch failed, running client-side graph solver:", err);
+                if (graphVis) {
+                    const localSteps = graphVis.generateLocalSteps(algo, start, nodes);
+                    graphVis.setSteps(localSteps, algo);
+                    if (shouldAutoPlay) {
+                        setTimeout(() => graphVis.play(), 300);
+                    }
+                }
+            });
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

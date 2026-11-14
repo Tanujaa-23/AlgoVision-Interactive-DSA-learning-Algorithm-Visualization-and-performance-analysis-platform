@@ -271,13 +271,11 @@
                                 <optgroup label="Searching Algorithms">
                                     <option value="Linear Search">Linear Search</option>
                                     <option value="Binary Search">Binary Search</option>
-                                    <option value="Jump Search">Jump Search</option>
                                 </optgroup>
                                 <optgroup label="Graph Algorithms">
                                     <option value="Breadth-First Search (BFS)">Breadth-First Search (BFS)</option>
                                     <option value="Depth-First Search (DFS)">Depth-First Search (DFS)</option>
                                     <option value="Dijkstra Shortest Path">Dijkstra Shortest Path</option>
-                                    <option value="Prim Minimum Spanning Tree">Prim Minimum Spanning Tree</option>
                                     <option value="Kruskal MST">Kruskal MST</option>
                                 </optgroup>
                             </select>

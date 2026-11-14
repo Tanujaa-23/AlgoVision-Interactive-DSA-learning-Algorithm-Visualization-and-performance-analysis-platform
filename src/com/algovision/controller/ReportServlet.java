@@ -45,19 +45,18 @@ public class ReportServlet extends HttpServlet {
 
         String lower = algoName.toLowerCase();
         boolean isGraph = lower.contains("bfs") || lower.contains("dfs") 
-                || lower.contains("dijkstra") || lower.contains("prim") 
-                || lower.contains("kruskal") || lower.contains("graph");
+                || lower.contains("dijkstra") || lower.contains("kruskal") || lower.contains("graph");
         boolean isSearch = !isGraph && (lower.contains("search") || lower.contains("linear") 
-                || lower.contains("binary") || lower.contains("jump"));
+                || lower.contains("binary"));
 
         String inputStr = request.getParameter("inputData");
         String outputStr = request.getParameter("outputData");
 
         if (inputStr == null || inputStr.trim().isEmpty()) {
             if (isGraph) {
-                inputStr = "Graph Nodes: [A, B, C, D], Edges: A-B(4), A-C(2), B-C(1), B-D(5), C-D(8), Source: Node A";
+                inputStr = "Graph Nodes: [1, 2, 3, 4, 5, 6, 7, 8, 9], Source: Node 1";
             } else if (isSearch) {
-                inputStr = "Target: 12, Array: [1, 2, 5, 8, 12, 16, 23, 34]";
+                inputStr = "1, 2, 5, 8, 12, 16, 23, 34";
             } else {
                 inputStr = "5, 2, 8, 1, 3, 9, 4, 7";
             }
@@ -66,16 +65,29 @@ public class ReportServlet extends HttpServlet {
         if (outputStr == null || outputStr.trim().isEmpty()) {
             if (isGraph) {
                 if (lower.contains("dijkstra")) {
-                    outputStr = "Shortest Path to D: A -> C -> B -> D (Min Cost: 8.0)";
-                } else if (lower.contains("prim") || lower.contains("kruskal")) {
-                    outputStr = "Minimum Spanning Tree Edges: [B-C(1), A-C(2), A-B(4)] (Total Weight: 7.0)";
+                    outputStr = "Shortest Path identified with minimum cumulative distance weight";
+                } else if (lower.contains("kruskal")) {
+                    outputStr = "Minimum Spanning Tree edges connected without cycles (Optimal MST)";
                 } else {
-                    outputStr = "Traversal Sequence: [A, B, C, D] (All reachable nodes visited)";
+                    outputStr = "Graph Traversal completed: all reachable vertices visited";
                 }
             } else if (isSearch) {
-                outputStr = "Target element 12 successfully located at index 4";
+                outputStr = "Target search element evaluated and located in input dataset";
             } else {
-                outputStr = "1, 2, 3, 4, 5, 7, 8, 9 (Ascending order)";
+                try {
+                    int[] parsedArr = com.algovision.util.ValidationUtil.parseIntegerArray(inputStr);
+                    int[] sortedArr = parsedArr.clone();
+                    java.util.Arrays.sort(sortedArr);
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < sortedArr.length; i++) {
+                        if (i > 0) sb.append(", ");
+                        sb.append(sortedArr[i]);
+                    }
+                    sb.append(" (Ascending order)");
+                    outputStr = sb.toString();
+                } catch (Exception e) {
+                    outputStr = inputStr + " (Ascending order)";
+                }
             }
         }
 
@@ -118,12 +130,8 @@ public class ReportServlet extends HttpServlet {
                 best = "O(1)"; avg = "O(n)"; worst = "O(n)"; space = "O(1)";
             } else if (lower.contains("binary")) {
                 best = "O(1)"; avg = "O(log n)"; worst = "O(log n)"; space = "O(1)";
-            } else if (lower.contains("jump")) {
-                best = "O(1)"; avg = "O(√n)"; worst = "O(√n)"; space = "O(1)";
             } else if (lower.contains("dijkstra")) {
                 best = "O((V + E) log V)"; avg = "O((V + E) log V)"; worst = "O((V + E) log V)"; space = "O(V)";
-            } else if (lower.contains("prim")) {
-                best = "O(E log V)"; avg = "O(E log V)"; worst = "O(E log V)"; space = "O(V)";
             } else if (lower.contains("kruskal")) {
                 best = "O(E log E)"; avg = "O(E log E)"; worst = "O(E log E)"; space = "O(V + E)";
             } else if (lower.contains("bfs") || lower.contains("dfs")) {

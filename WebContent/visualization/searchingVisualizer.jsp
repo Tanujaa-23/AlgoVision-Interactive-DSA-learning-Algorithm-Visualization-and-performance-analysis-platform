@@ -61,12 +61,11 @@
                     <select id="algorithmSelect" class="form-select bg-dark text-light border-secondary">
                         <option value="Linear Search" ${"Linear Search".equalsIgnoreCase(selectedAlgo) ? "selected" : ""}>Linear Search</option>
                         <option value="Binary Search" ${"Binary Search".equalsIgnoreCase(selectedAlgo) ? "selected" : ""}>Binary Search</option>
-                        <option value="Jump Search" ${"Jump Search".equalsIgnoreCase(selectedAlgo) ? "selected" : ""}>Jump Search</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label text-info small fw-bold">ARRAY (SORTED FOR BINARY/JUMP)</label>
-                    <input type="text" id="inputData" class="form-control bg-dark text-light border-secondary" value="1, 2, 5, 8, 12, 16, 23, 34">
+                    <label class="form-label text-info small fw-bold">ARRAY (SORTED FOR BINARY SEARCH)</label>
+                    <input type="text" id="inputData" class="form-control bg-dark text-light border-secondary" value="1, 2, 3, 4, 5, 6, 7, 8, 9" placeholder="e.g. 1, 2, 3, 4, 5, 6, 7, 8, 9">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label text-info small fw-bold">TARGET VALUE</label>
@@ -113,6 +112,18 @@
 
         <!-- Array Visualizer Bar Canvas -->
         <div class="visualizer-container mb-4" id="arrayContainer"></div>
+
+        <!-- Search Result Banner -->
+        <div id="finalResultBanner" class="alert alert-success border border-success d-none align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-4" id="resultIcon"></i>
+                <div>
+                    <strong id="finalResultTitle" class="d-block text-white">Search Completed</strong>
+                    <span id="finalResultText" class="text-light small">Result details</span>
+                </div>
+            </div>
+            <span id="finalResultBadge" class="badge bg-success px-3 py-2">Found</span>
+        </div>
 
         <!-- Step Explanation -->
         <div class="alert alert-dark border border-secondary d-flex align-items-center gap-3 mb-4">

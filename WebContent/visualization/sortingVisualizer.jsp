@@ -116,6 +116,18 @@
             <!-- Dynamic Array Bars Rendered via visualization.js -->
         </div>
 
+        <!-- Final Sorted Result Banner -->
+        <div id="finalResultBanner" class="alert alert-success border border-success d-none align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                <div>
+                    <strong class="d-block text-white">Array Fully Sorted!</strong>
+                    <span id="finalResultText" class="text-light small">Result: [ ]</span>
+                </div>
+            </div>
+            <span class="badge bg-success px-3 py-2">Sorted Result</span>
+        </div>
+
         <!-- Current Step Explanation -->
         <div class="alert alert-dark border border-secondary d-flex align-items-center gap-3 mb-4">
             <i class="bi bi-info-circle-fill text-info h4 mb-0"></i>

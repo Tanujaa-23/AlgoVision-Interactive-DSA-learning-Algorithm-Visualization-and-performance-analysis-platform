@@ -86,10 +86,6 @@ public class AlgorithmService {
                 Arrays.sort(inputArr);
                 steps = BinarySearch.searchWithSteps(inputArr, target);
                 break;
-            case "jump search":
-                Arrays.sort(inputArr);
-                steps = JumpSearch.searchWithSteps(inputArr, target);
-                break;
             case "linear search":
             default:
                 steps = LinearSearch.searchWithSteps(inputArr, target);

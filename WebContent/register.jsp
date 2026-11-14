@@ -36,7 +36,6 @@
                     <label class="form-label text-info small fw-bold">ROLE</label>
                     <select name="role" class="form-select bg-dark text-light border-secondary">
                         <option value="STUDENT" selected>Student</option>
-                        <option value="ADMIN">Admin / Instructor</option>
                     </select>
                 </div>
                 <div class="row">
